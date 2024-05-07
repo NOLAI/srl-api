@@ -116,8 +116,10 @@ async def create_series(df, cog_type):
         m_np.append(row.to_list())
 
     # adding a blank at the end in case the last process is of the other type of label
-    if m_df.iloc[-1]["process_end_time"] < settings.MAX_TIME:
-        m_np.append([m_df.iloc[-1]["process_end_time"], ["process_end_time"], settings.MAX_TIME - m_df.iloc[-1]["process_end_time"], "Niet Gedetecteerd", blank_colour])
+    if len(m_df) > 0 and m_df.iloc[-1]["process_end_time"] < settings.MAX_TIME:
+        m_np.append([m_df.iloc[-1]["process_end_time"], settings.MAX_TIME, settings.MAX_TIME - m_df.iloc[-1]["process_end_time"], "Niet Gedetecteerd", blank_colour])
+    elif len(m_df) == 0:
+        m_np.append([0, settings.MAX_TIME, settings.MAX_TIME, "Niet Gedetecteerd", blank_colour])
     
     m_df = pd.DataFrame(m_np,
                         columns=["process_start_time", "process_end_time", "process_time_spend", "process_sub",
