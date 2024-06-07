@@ -56,19 +56,19 @@ class Settings(BaseSettings):
         raise ValueError(v)
 
     FLORA_ANNOTATION_DATABASE_URI: str = "mysql://{}:{}@{}:{}/{}".format(
-        os.getenv('DB_USER'),
-        os.getenv('DB_PASSWORD'),
-        os.getenv('DB_HOST'),
-        '3306',
-        'flora_annotation',
+        os.getenv('DB_FLORA_ANNOTATION_USER'),
+        os.getenv('DB_FLORA_ANNOTATION_PASSWORD'),
+        os.getenv('DB_FLORA_ANNOTATION_HOST'),
+        os.getenv('DB_FLORA_ANNOTATION_PORT'),
+        os.getenv('DB_FLORA_ANNOTATION'),
     )
 
     MOODLE_DATABASE_URI: str = "mysql://{}:{}@{}:{}/{}".format(
-        os.getenv('DB_USER'),
-        os.getenv('DB_PASSWORD'),
-        os.getenv('DB_HOST'),
-        '3306',
-        'moodle',
+        os.getenv('DB_MOODLE_USER'),
+        os.getenv('DB_MOODLE_PASSWORD'),
+        os.getenv('DB_MOODLE_HOST'),
+        os.getenv('DB_MOODLE_PORT'),
+        os.getenv('DB_MOODLE'),
     )
 
     class Config:

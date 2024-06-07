@@ -8,19 +8,26 @@ services:
     command: uvicorn app.main:app --host 0.0.0.0 --port 88 --reload --proxy-headers
     environment:
       WATCHFILES_FORCE_POLLING: 'true'
-      DB_USER: 'user'
-      DB_PASSWORD: 'password'
-      DB_HOST: 'mysql'
+      DB_FLORA_ANNOTATION: ${DB_FLORA_ANNOTATION}
+      DB_FLORA_ANNOTATION_USER: ${DB_FLORA_ANNOTATION_USER}
+      DB_FLORA_ANNOTATION_PASSWORD: ${DB_FLORA_ANNOTATION_PASSWORD}
+      DB_FLORA_ANNOTATION_HOST: ${DB_FLORA_ANNOTATION_HOST}
+      DB_FLORA_ANNOTATION_PORT: ${DB_FLORA_ANNOTATION_PORT}
+      DB_MOODLE: ${DB_MOODLE}
+      DB_MOODLE_USER: ${DB_MOODLE_USER}
+      DB_MOODLE_PASSWORD: ${DB_MOODLE_PASSWORD}
+      DB_MOODLE_HOST: ${DB_MOODLE_HOST}
+      DB_MOODLE_PORT: ${DB_MOODLE_PORT}
     volumes:
       - ./app:/app/app
 
   mysql:
     image: mysql:8.1
     environment:
-      MYSQL_DATABASE: 'flora_annotation'
-      MYSQL_USER: 'user'
-      MYSQL_PASSWORD: 'password'
-      MYSQL_ROOT_PASSWORD: 'password'
+      MYSQL_DATABASE: ${DB_FLORA_ANNOTATION}
+      MYSQL_USER: ${DB_FLORA_ANNOTATION_USER}
+      MYSQL_PASSWORD: ${DB_FLORA_ANNOTATION_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_FLORA_ANNOTATION_PASSWORD}
     volumes:
       - mysql_db:/var/lib/mysql
       
