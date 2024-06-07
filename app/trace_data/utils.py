@@ -27,7 +27,6 @@ def load_label_meanings():
 
 
 async def model_to_df(trace_data):
-    username = list()
     save_time = list()
     # Process start time is in ms
     process_start_time = list()
@@ -56,7 +55,6 @@ async def model_to_df(trace_data):
 
         if last_process_label != data.process_label:
             if start_time < settings.MAX_TIME:
-                username.append(data.username)
                 save_time.append(data.save_time)
                 process_label.append(data.process_label)
                 last_process_label = data.process_label
@@ -68,7 +66,6 @@ async def model_to_df(trace_data):
 
 
     df = pd.DataFrame(data={
-        'username': username,
         'process_start_time': process_start_time,
         'process_end_time': process_end_time,
         'process_label': process_label,
@@ -108,7 +105,7 @@ async def create_series(df, cog_type):
     # now we iterate through each row of the df and if there is a gap between two processes we fill the gap with a BLANK
     m_np = []
 
-    if m_df.iloc[0]["process_start_time"] > 0:
+    if len(m_df) > 0 and m_df.iloc[0]["process_start_time"] > 0:
         m_np.append([0, m_df.iloc[0]["process_start_time"],  m_df.iloc[0]["process_start_time"], "Niet Gedetecteerd", blank_colour])
 
     for i, row in m_df.iterrows():
@@ -119,8 +116,10 @@ async def create_series(df, cog_type):
         m_np.append(row.to_list())
 
     # adding a blank at the end in case the last process is of the other type of label
-    if m_df.iloc[-1]["process_end_time"] < settings.MAX_TIME:
-        m_np.append([m_df.iloc[-1]["process_end_time"], ["process_end_time"], settings.MAX_TIME - m_df.iloc[-1]["process_end_time"], "Niet Gedetecteerd", blank_colour])
+    if len(m_df) > 0 and m_df.iloc[-1]["process_end_time"] < settings.MAX_TIME:
+        m_np.append([m_df.iloc[-1]["process_end_time"], settings.MAX_TIME, settings.MAX_TIME - m_df.iloc[-1]["process_end_time"], "Niet Gedetecteerd", blank_colour])
+    elif len(m_df) == 0:
+        m_np.append([0, settings.MAX_TIME, settings.MAX_TIME, "Niet Gedetecteerd", blank_colour])
     
     m_df = pd.DataFrame(m_np,
                         columns=["process_start_time", "process_end_time", "process_time_spend", "process_sub",

@@ -1,0 +1,44 @@
+version: "3.9"
+services:
+  backend:
+    container_name: backend
+    ports:
+      - '80:88'
+    build: .
+    command: uvicorn app.main:app --host 0.0.0.0 --port 88 --reload --proxy-headers
+    environment:
+      WATCHFILES_FORCE_POLLING: 'true'
+      DB_FLORA_ANNOTATION: ${DB_FLORA_ANNOTATION}
+      DB_FLORA_ANNOTATION_USER: ${DB_FLORA_ANNOTATION_USER}
+      DB_FLORA_ANNOTATION_PASSWORD: ${DB_FLORA_ANNOTATION_PASSWORD}
+      DB_FLORA_ANNOTATION_HOST: ${DB_FLORA_ANNOTATION_HOST}
+      DB_FLORA_ANNOTATION_PORT: ${DB_FLORA_ANNOTATION_PORT}
+      DB_MOODLE: ${DB_MOODLE}
+      DB_MOODLE_USER: ${DB_MOODLE_USER}
+      DB_MOODLE_PASSWORD: ${DB_MOODLE_PASSWORD}
+      DB_MOODLE_HOST: ${DB_MOODLE_HOST}
+      DB_MOODLE_PORT: ${DB_MOODLE_PORT}
+    volumes:
+      - ./app:/app/app
+
+  mysql:
+    image: mysql:8.1
+    environment:
+      MYSQL_DATABASE: ${DB_FLORA_ANNOTATION}
+      MYSQL_USER: ${DB_FLORA_ANNOTATION_USER}
+      MYSQL_PASSWORD: ${DB_FLORA_ANNOTATION_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_FLORA_ANNOTATION_PASSWORD}
+    volumes:
+      - mysql_db:/var/lib/mysql
+      
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+    ports:
+      - '81:80'
+
+volumes:
+  mysql_db:

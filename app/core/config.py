@@ -10,7 +10,6 @@ from pydantic import (
 )
 from pydantic_settings import BaseSettings
 import os
-from dotenv import load_dotenv
 
 try:
     from enum import StrEnum
@@ -33,7 +32,6 @@ class Paths:
     BASE_DIR: Path = ROOT_DIR / "app"
     ASSETS_DIR: Path = BASE_DIR / "assets"
     LABEL_NAMES_CSV: Path = ASSETS_DIR / "label_names.csv"
-    INFRA_DIR: Path = ROOT_DIR / "infra"
 
 
 class Settings(BaseSettings):
@@ -57,14 +55,20 @@ class Settings(BaseSettings):
             return v
         raise ValueError(v)
 
-    load_dotenv(dotenv_path=Path("infra/.env"))
+    FLORA_ANNOTATION_DATABASE_URI: str = "mysql://{}:{}@{}:{}/{}".format(
+        os.getenv('DB_FLORA_ANNOTATION_USER'),
+        os.getenv('DB_FLORA_ANNOTATION_PASSWORD'),
+        os.getenv('DB_FLORA_ANNOTATION_HOST'),
+        os.getenv('DB_FLORA_ANNOTATION_PORT'),
+        os.getenv('DB_FLORA_ANNOTATION'),
+    )
 
-    DATABASE_URI: str = "mysql://{}:{}@{}:{}/{}".format(
-        os.getenv('DB_USER'),
-        os.getenv('DB_PASSWORD'),
-        os.getenv('DB_HOST'),
-        '3306',
-        os.getenv('DB_NAME'),
+    MOODLE_DATABASE_URI: str = "mysql://{}:{}@{}:{}/{}".format(
+        os.getenv('DB_MOODLE_USER'),
+        os.getenv('DB_MOODLE_PASSWORD'),
+        os.getenv('DB_MOODLE_HOST'),
+        os.getenv('DB_MOODLE_PORT'),
+        os.getenv('DB_MOODLE'),
     )
 
     class Config:
