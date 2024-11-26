@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.db.config import register_db
-from app.trace_data.routes import router as tracedata_router
+from app.user.routes import router as user_router
+from app.essay.routes import router as essay_router
+from app.process.routes import router as process_router
 
 origins = [
     '*'
@@ -12,7 +14,9 @@ def get_application() -> FastAPI:
         title="SRL API",
         description=""
     )
-    _app.include_router(tracedata_router)
+    _app.include_router(user_router)
+    _app.include_router(essay_router)
+    _app.include_router(process_router)
     _app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
@@ -27,8 +31,3 @@ def get_application() -> FastAPI:
 
 
 app = get_application()
-
-@app.get("/")
-def root():
-    message = "World"
-    return {"Hello": message}

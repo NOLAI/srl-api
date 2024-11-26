@@ -13,7 +13,7 @@ class TraceData(Model):
         table = "trace_data"
 
     def __str__(self):
-        return self.username
+        return self.process_label
 
 class MdlUser(Model):
     id = fields.IntField(pk=True)
