@@ -18,8 +18,10 @@ services:
       DB_MOODLE_PASSWORD: ${DB_MOODLE_PASSWORD}
       DB_MOODLE_HOST: ${DB_MOODLE_HOST}
       DB_MOODLE_PORT: ${DB_MOODLE_PORT}
+      DATA_DIR: ${DATA_DIR}
     volumes:
       - ./app:/app/app
+      - ./data:/data
 
   mysql:
     image: mysql:8.1
