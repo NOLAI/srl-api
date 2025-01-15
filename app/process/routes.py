@@ -17,7 +17,6 @@ async def get_processes(user_id: int, course_id: int):
         return []
     essay_start_time = int(trace[0].save_time)
     trace = [{
-        # 'process_label': row.process_label,
         'type': PROCESSES[row.process_label]['type'],
         'process': PROCESSES[row.process_label]['process'],
         'colour': PROCESSES[row.process_label]['colour'],
@@ -32,9 +31,6 @@ async def get_processes(user_id: int, course_id: int):
     csv_path = os.path.join(os.getenv('DATA_DIR'), f'nlp/{user_id}_{course_id}.csv')
     if os.path.exists(csv_path):
         df_nlp = pd.read_csv(csv_path, delimiter=';')
-        # df_nlp = df_nlp.sort_values(by=['start_time'])
-        # df_nlp['end_time'] = df_nlp['end_time']-df_nlp['start_time'].iloc[0]
-        # df_nlp['start_time'] = df_nlp['start_time']-df_nlp['start_time'].iloc[0]
 
         trace = [row for row in trace if row['process'] != 'writing']
 
@@ -48,6 +44,7 @@ async def get_processes(user_id: int, course_id: int):
                 'end_time': int(row['end_time']) - essay_start_time,
             })
 
+    trace.sort(key=lambda x: x['start_time'])
     return trace
 
 PROCESSES = {
