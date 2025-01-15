@@ -33,19 +33,16 @@ async def get_goals(user_id: int, course_id: int):
     return [
         {
             'name': 'structure',
-            'colour': 'hotpink',
             'subgoals': [{'name': k, 'completed': v} for k, v in df_goals.iloc[-1]['structure'].items()],
             'events': [event for event in [{'time': int(df_goals.iloc[i]['time']), 'names': [k for k, v in df_goals.iloc[i]['structure'].items() if v and (i == 0 or not df_goals.iloc[i-1]['structure'][k])]} for i in range(len(df_goals))] if len(event['names'])],
         },
         {
             'name': 'relevance',
-            'colour': 'darkviolet',
             'subgoals': [{'name': ('paragraph', {'number': k+1}), 'completed': v,} for k, v in enumerate(df_goals.iloc[-1]['relevance'])],
             'events': [{'time': int(df_goals.iloc[i]['time']), 'names': []} for i in range(len(df_goals)) if (i == 0 and len(df_goals.iloc[i]['relevance'])) or (i > 0 and df_goals.iloc[i]['relevance'] > df_goals.iloc[i-1]['relevance'])],
         },
         {
             'name': 'main_points',
-            'colour': 'gold',
             'subgoals': [{'name': ('main_point', {'name': k}), 'completed': v} for k, v in df_goals.iloc[-1]['main_points'].items()],
             'events': [event for event in [{'time': int(df_goals.iloc[i]['time']), 'names': [('main_point', {'name': k}) for k, v in df_goals.iloc[i]['main_points'].items() if v and (i == 0 or not df_goals.iloc[i-1]['main_points'][k])]} for i in range(len(df_goals))] if len(event['names'])],
         },
