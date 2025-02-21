@@ -66,6 +66,7 @@ PROCESSES = {
     "MCM8": { "type": "metacognition", "process": "monitoring"},
     "LCF1": { "type": "cognition", "process": "reading"},
     "LCF2": { "type": "cognition", "process": "reading"},
+    "LCF3": { "type": "cognition", "process": "reading"},
     "LCF4": { "type": "cognition", "process": "reading"},
     "LCF5": { "type": "cognition", "process": "reading"},
     "LCF6": { "type": "cognition", "process": "reading"},
