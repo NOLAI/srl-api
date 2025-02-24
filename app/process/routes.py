@@ -56,6 +56,8 @@ PROCESSES = {
     "MCP4": { "type": "metacognition", "process": "planning"},
     "MCE1": { "type": "metacognition", "process": "evaluation"},
     "MCE2": { "type": "metacognition", "process": "evaluation"},
+    "MCE3": { "type": "metacognition", "process": "evaluation"},
+    "MCE4": { "type": "metacognition", "process": "evaluation"},
     "MCM1": { "type": "metacognition", "process": "monitoring"},
     "MCM2": { "type": "metacognition", "process": "monitoring"},
     "MCM3": { "type": "metacognition", "process": "monitoring"},
