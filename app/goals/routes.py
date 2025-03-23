@@ -1,10 +1,10 @@
 from fastapi import APIRouter
 
 import os
-import pandas as pd
 import json
 
-from app.db.models import TraceData
+from app.db.models import Essay, EssayProductGoals, TraceData
+from app.goals.goals import init_nlp, process_essay, process_essays
 
 router = APIRouter(prefix="/api/goals", tags=["process"])
 
@@ -13,37 +13,92 @@ router = APIRouter(prefix="/api/goals", tags=["process"])
     status_code=200,
 )
 async def get_goals(user_id: int, course_id: int):
-    csv_path = os.path.join(os.getenv('DATA_DIR'), f'goals/{user_id}_{course_id}.csv')
-    if not os.path.exists(csv_path):
+    with open(os.path.join(os.getenv('DATA_DIR'), 'goals.json'), 'r') as file:
+        tasks = json.loads(file.read())
+    if not str(course_id) in tasks:
         return []
+    task = tasks[str(course_id)]
     
     trace = await TraceData.filter(user_id=user_id, process_label__isnull=False, course_id=course_id).order_by('save_time')
     if not len(trace):
         return []
     essay_start_time = int(trace[0].save_time)
-    
-    df_goals = pd.read_csv(csv_path, delimiter=';')
-    df_goals['time'] = df_goals['time'] - essay_start_time
-    df_goals = df_goals[['time']].join([
-        df_goals['structure'].apply(json.loads),
-        df_goals['relevance'].apply(json.loads),
-        df_goals['main_points'].apply(json.loads),
-    ])
+
+    essays = await Essay.filter(user_id=user_id, course_id=course_id).order_by('save_time')
+    essays = [essay for i, essay in enumerate(essays) if i == len(essays)-1 or int(essays[i+1].save_time) - int(essay.save_time) > 3000]
+
+    goals = []
+    nlp, task_lang = None, None
+    for essay in essays:
+        essay_goals = await essay.product_goals
+        if essay_goals:
+            goals.append({
+                'time': int(essay.save_time) - essay_start_time,
+                'structure': essay_goals[0].structure,
+                'relevance': essay_goals[0].relevance,
+                'main_points': essay_goals[0].main_points,
+            })
+        else:
+            if nlp is None:
+                nlp, task_lang = init_nlp(essays[-1].essay_content, task)
+            essay_goals = process_essay(essay.essay_content, task_lang, nlp)
+            await EssayProductGoals.create(
+                essay_id=essay.id,
+                structure=essay_goals['structure'],
+                relevance=essay_goals['relevance'],
+                main_points=essay_goals['main_points'],
+            )
+            goals.append({
+                'time': int(essay.save_time) - essay_start_time,
+                **essay_goals
+            })
 
     return [
         {
             'name': 'structure',
-            'subgoals': [{'name': k, 'completed': v} for k, v in df_goals.iloc[-1]['structure'].items()],
-            'events': [event for event in [{'time': int(df_goals.iloc[i]['time']), 'names': [k for k, v in df_goals.iloc[i]['structure'].items() if v and (i == 0 or not df_goals.iloc[i-1]['structure'][k])]} for i in range(len(df_goals))] if len(event['names'])],
+            'subgoals': goals[-1]['structure'],
+            'events': [event for event in [{'time': goal['time'], 'names': [s['name'] for j, s in enumerate(goal['structure']) if s['completed'] and (i == 0 or not goals[i-1]['structure'][j]['completed'])]} for i, goal in enumerate(goals)] if len(event['names'])],
         },
         {
             'name': 'relevance',
-            'subgoals': [{'name': ('paragraph', {'number': k+1}), 'completed': v,} for k, v in enumerate(df_goals.iloc[-1]['relevance'])],
-            'events': [{'time': int(df_goals.iloc[i]['time']), 'names': []} for i in range(len(df_goals)) if (i == 0 and len(df_goals.iloc[i]['relevance'])) or (i > 0 and df_goals.iloc[i]['relevance'] > df_goals.iloc[i-1]['relevance'])],
+            'subgoals': [{'name': ('paragraph', {'number': k+1}), 'completed': v,} for k, v in enumerate(goals[-1]['relevance'])],
+            'events': [{'time': int(goal['time']), 'names': []} for i, goal in enumerate(goals) if (i == 0 and len(goal['relevance'])) or (i > 0 and sum(goal['relevance']) > sum(goals[i-1]['relevance']))],
         },
         {
             'name': 'main_points',
-            'subgoals': [{'name': ('main_point', {'name': k}), 'completed': v} for k, v in df_goals.iloc[-1]['main_points'].items()],
-            'events': [event for event in [{'time': int(df_goals.iloc[i]['time']), 'names': [('main_point', {'name': k}) for k, v in df_goals.iloc[i]['main_points'].items() if v and (i == 0 or not df_goals.iloc[i-1]['main_points'][k])]} for i in range(len(df_goals))] if len(event['names'])],
+            'subgoals': [{'name': ('main_point', {'name': m['name']}), 'completed': m['completed']} for m in goals[-1]['main_points']],
+            'events': [event for event in [{'time': int(goal['time']), 'names': [('main_point', {'name': m['name']}) for j, m in enumerate(goal['main_points']) if m['completed'] and (i == 0 or not goals[i-1]['main_points'][j]['completed'])]} for i, goal in enumerate(goals)] if len(event['names'])],
         },
     ]
+
+
+async def process_essays_job():
+    print("Processing essays...", flush=True)
+    with open(os.path.join(os.getenv('DATA_DIR'), 'goals.json'), 'r') as file:
+        tasks = json.loads(file.read())
+    sessions = await Essay.filter(course_id__in=tasks.keys()).distinct().values('user_id', 'course_id')
+    for session in sessions:
+        if not session['user_id'] or not session['course_id']:
+            continue
+        user_id = int(session['user_id'])
+        course_id = int(session['course_id'])
+        essays = await Essay.filter(user_id=user_id, course_id=course_id).order_by('save_time')
+        essays = [{
+            'id': int(essay.id),
+            'content': essay.essay_content,
+        } for i, essay in enumerate(essays) if (i == 0 or int(essay.save_time) - int(essays[i-1].save_time) > 3000) and not await essay.product_goals]
+        
+        if not essays:
+            continue
+
+        print(f"Processing {len(essays)} essays for user {user_id} in course {course_id}...", flush=True)
+        essays = process_essays(essays, tasks[str(course_id)])
+        for essay in essays:
+            await EssayProductGoals.create(
+                essay_id=essay['id'],
+                structure=essay['structure'],
+                relevance=essay['relevance'],
+                main_points=essay['main_points'],
+            )
+    
+    print("Finished processing essays.", flush=True)
