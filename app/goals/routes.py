@@ -26,6 +26,8 @@ async def get_goals(user_id: int, course_id: int):
 
     essays = await Essay.filter(user_id=user_id, course_id=course_id).order_by('save_time')
     essays = [essay for i, essay in enumerate(essays) if i == len(essays)-1 or int(essays[i+1].save_time) - int(essay.save_time) > 3000]
+    if not len(essays):
+        return []
 
     goals = []
     nlp, task_lang = None, None
@@ -71,7 +73,10 @@ async def get_goals(user_id: int, course_id: int):
         },
     ]
 
-
+@router.get(
+    "/process",
+    status_code=200,
+)
 async def process_essays_job():
     print("Processing essays...", flush=True)
     with open(os.path.join(os.getenv('DATA_DIR'), 'goals.json'), 'r') as file:
@@ -102,3 +107,4 @@ async def process_essays_job():
             )
     
     print("Finished processing essays.", flush=True)
+    return "done"
