@@ -85,19 +85,17 @@ async def process_essays_job():
     for session in sessions:
         if not session['user_id'] or not session['course_id']:
             continue
-        user_id = int(session['user_id'])
-        course_id = int(session['course_id'])
-        essays = await Essay.filter(user_id=user_id, course_id=course_id).order_by('save_time')
+        essays = await Essay.filter(user_id=session['user_id'], course_id=session['course_id']).order_by('save_time')
         essays = [{
             'id': int(essay.id),
             'content': essay.essay_content,
-        } for i, essay in enumerate(essays) if (i == 0 or int(essay.save_time) - int(essays[i-1].save_time) > 3000) and not await essay.product_goals]
+        } for i, essay in enumerate(essays) if (i == len(essays)-1 or int(essays[i+1].save_time) - int(essay.save_time) > 3000) and not await essay.product_goals]
         
         if not essays:
             continue
 
-        print(f"Processing {len(essays)} essays for user {user_id} in course {course_id}...", flush=True)
-        essays = process_essays(essays, tasks[str(course_id)])
+        print(f"Processing {len(essays)} essays for user {session['user_id']} in course {session['course_id']}...", flush=True)
+        essays = process_essays(essays, tasks[session['course_id']])
         for essay in essays:
             await EssayProductGoals.create(
                 essay_id=essay['id'],
