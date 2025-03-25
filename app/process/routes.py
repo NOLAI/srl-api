@@ -4,8 +4,12 @@ from app.db.models import TraceData
 
 import os
 import pandas as pd
+import xgboost as xgb
 
 router = APIRouter(prefix="/api/process", tags=["process"])
+
+model = xgb.XGBClassifier()
+model.load_model(os.path.join('app', 'process', 'all_XGB_model_s2.json'))
 
 @router.get(
     "/{user_id}/{course_id}",
@@ -27,18 +31,27 @@ async def get_processes(user_id: int, course_id: int):
         'end_time': int(trace[i + 1]['start_time'] if i + 1 < len(trace) else row['start_time']),
         } for i, row in enumerate(trace) if row['process'] != 'essay_task_start' and row['process'] != 'essay_task_end']
     
-    csv_path = os.path.join(os.getenv('DATA_DIR'), f'nlp/{user_id}_{course_id}.csv')
-    if os.path.exists(csv_path):
-        df_nlp = pd.read_csv(csv_path, delimiter=';')
+    features_path = os.path.join(os.getenv('DATA_DIR'), f'writing/{user_id}_{course_id}.xlsx')
+    if os.path.exists(features_path):
+        df_features = pd.read_excel(features_path)
 
         trace = [row for row in trace if row['process'] != 'writing']
 
-        for _, row in df_nlp.iterrows():
+        df_features.columns = df_features.columns.str.strip().str.replace('overlap_instr', 'overlap_instruction').str.replace('overlap_rubr', 'overlap_rubric')
+        feature_names = model.get_booster().feature_names
+        for col in df_features.columns:
+            if col not in feature_names:
+                del df_features[col]
+        df_features = df_features[feature_names]
+
+        predictions = model.predict(df_features)
+
+        for i, row in df_features.iterrows():
             trace.append({
-                'type': PROCESSES[row['label']]['type'],
-                'process': PROCESSES[row['label']]['process'],
-                'start_time': int(row['start_time']) - essay_start_time,
-                'end_time': int(row['end_time']) - essay_start_time,
+                'type': PROCESSES[LABELS[predictions[i]]]['type'],
+                'process': PROCESSES[LABELS[predictions[i]]]['process'],
+                'start_time': int(row['start_time']),
+                'end_time': int(row['end_time']),
             })
 
     trace.sort(key=lambda x: x['start_time'])
@@ -99,3 +112,5 @@ PROCESSES = {
     "CE": { "type": "cognition", "process": "expanding"},
     "NL": { "type": "other", "process": "not_detected"},
 }
+
+LABELS = ['NL', 'COO', 'CV', 'COR', 'CE', 'MM', 'MO', 'ME', 'MP']
