@@ -1,0 +1,1 @@
+0 1 * * * /usr/bin/curl http://localhost:88/api/goals/process >> /app/cron.log 2>&1
