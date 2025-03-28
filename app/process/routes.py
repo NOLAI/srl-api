@@ -33,26 +33,32 @@ async def get_processes(user_id: int, course_id: int):
     
     features_path = os.path.join(os.getenv('DATA_DIR'), f'writing/{user_id}_{course_id}.xlsx')
     if os.path.exists(features_path):
-        df_features = pd.read_excel(features_path)
+        try:
+            df_features = pd.read_excel(features_path)
 
-        trace = [row for row in trace if row['process'] != 'writing']
+            trace_writing = []
 
-        df_features.columns = df_features.columns.str.strip().str.replace('overlap_instr', 'overlap_instruction').str.replace('overlap_rubr', 'overlap_rubric')
-        feature_names = model.get_booster().feature_names
-        for col in df_features.columns:
-            if col not in feature_names:
-                del df_features[col]
-        df_features = df_features[feature_names]
+            df_features.columns = df_features.columns.str.strip().str.replace('overlap_instr', 'overlap_instruction').str.replace('overlap_rubr', 'overlap_rubric')
+            feature_names = model.get_booster().feature_names
+            for col in df_features.columns:
+                if col not in feature_names:
+                    del df_features[col]
+            df_features = df_features[feature_names]
 
-        predictions = model.predict(df_features)
+            predictions = model.predict(df_features)
 
-        for i, row in df_features.iterrows():
-            trace.append({
-                'type': PROCESSES[LABELS[predictions[i]]]['type'],
-                'process': PROCESSES[LABELS[predictions[i]]]['process'],
-                'start_time': int(row['start_time']),
-                'end_time': int(row['end_time']),
-            })
+            for i, row in df_features.iterrows():
+                trace_writing.append({
+                    'type': PROCESSES[LABELS[predictions[i]]]['type'],
+                    'process': PROCESSES[LABELS[predictions[i]]]['process'],
+                    'start_time': int(row['start_time']),
+                    'end_time': int(row['end_time']),
+                })
+
+            trace = [row for row in trace if row['process'] != 'writing']
+            trace += trace_writing
+        except Exception as e:
+            print(e)
 
     trace.sort(key=lambda x: x['start_time'])
     return trace
