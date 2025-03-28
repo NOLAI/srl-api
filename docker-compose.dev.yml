@@ -5,7 +5,7 @@ services:
     ports:
       - '80:88'
     build: .
-    command: uvicorn app.main:app --host 0.0.0.0 --port 88 --reload --proxy-headers
+    entrypoint: uvicorn app.main:app --host 0.0.0.0 --port 88 --reload --proxy-headers
     environment:
       WATCHFILES_FORCE_POLLING: 'true'
       DB_FLORA_ANNOTATION: ${DB_FLORA_ANNOTATION}
