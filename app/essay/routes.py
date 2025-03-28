@@ -1,3 +1,5 @@
+import json
+import os
 from fastapi import APIRouter
 from tortoise import connections
 
@@ -12,11 +14,22 @@ router = APIRouter(prefix="/api/essay", tags=["user"])
 async def get_essays_list(user_id: int):
     db_moodle = connections.get('moodle')
 
+    ignored_courses = []
+    ignored_courses_path = os.path.join(os.getenv('DATA_DIR'), 'ignored_courses.json')
+    if os.path.exists(ignored_courses_path):
+        with open(ignored_courses_path, 'r') as file:
+            try:
+                ignored_courses = json.loads(file.read())
+            except:
+                pass
+
     course_ids = await TraceData.filter(user_id=user_id, process_label__isnull=False).distinct().values('course_id')
 
     essays = []
 
     for course_id in course_ids:
+        if int(course_id['course_id']) in ignored_courses:
+            continue
         try:
             course = await MdlCourse.get(id=course_id['course_id'], using_db=db_moodle)
             name_en = course.fullname if course.fullname else "Essay "+str(course_id['course_id'])
