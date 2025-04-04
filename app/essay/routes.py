@@ -2,6 +2,7 @@ import json
 import os
 from fastapi import APIRouter
 from tortoise import connections
+from tortoise.functions import Max
 
 from app.db.models import MdlCourse, TraceData
 
@@ -23,7 +24,7 @@ async def get_essays_list(user_id: int):
             except:
                 pass
 
-    course_ids = await TraceData.filter(user_id=user_id, process_label__isnull=False).distinct().values('course_id')
+    course_ids = await TraceData.filter(user_id=user_id, process_label__isnull=False).annotate(save_time_max=Max('save_time')).distinct().group_by('course_id').order_by('save_time_max').values('course_id', 'save_time_max')
 
     essays = []
 
