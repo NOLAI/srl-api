@@ -5,6 +5,7 @@ COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 RUN python -m spacy download en_core_web_md
 RUN python -m spacy download nl_core_news_md
+RUN python -m spacy download nl_core_news_lg
 COPY crontab /etc/cron.d/crontab
 RUN chmod 0644 /etc/cron.d/crontab && crontab /etc/cron.d/crontab
 COPY entrypoint.sh entrypoint.sh
