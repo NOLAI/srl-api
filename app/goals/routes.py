@@ -78,7 +78,7 @@ async def get_goals(user_id: int, course_id: int):
     status_code=200,
 )
 async def process_essays_job():
-    print("Processing essays...", flush=True)
+    print("Running product goals job...", flush=True)
     with open(os.path.join(os.getenv('DATA_DIR'), 'goals.json'), 'r') as file:
         tasks = json.loads(file.read())
     sessions = await Essay.filter(course_id__in=tasks.keys()).distinct().values('user_id', 'course_id')
@@ -104,5 +104,5 @@ async def process_essays_job():
                 main_points=essay['main_points'],
             )
     
-    print("Finished processing essays.", flush=True)
+    print("Finished product goals job.", flush=True)
     return "done"

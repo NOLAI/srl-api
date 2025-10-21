@@ -15,6 +15,20 @@ class TraceData(Model):
     def __str__(self):
         return self.process_label
     
+class WritingProcess(Model):
+    id = fields.IntField(pk=True)
+    user_id = fields.IntField(null=False)
+    course_id = fields.IntField(null=False)
+    start_time = fields.BigIntField(null=False)
+    end_time = fields.BigIntField(null=False)
+    process_label = fields.CharField(max_length=255, null=False)
+
+    class Meta:
+        table = "writing_process"
+
+    def __str__(self):
+        return self.process_label
+    
 class Essay(Model):
     id = fields.IntField(pk=True)
     user_id = fields.IntField()
@@ -58,3 +72,16 @@ class MdlCourse(Model):
 
     def __str__(self):
         return self.fullname
+    
+
+class MdlPage(Model):
+    id = fields.IntField(pk=True)
+    course = fields.IntField()
+    name = fields.CharField(max_length=255)
+    content = fields.TextField()
+
+    class Meta:
+        table = "mdl_page"
+
+    def __str__(self):
+        return self.name

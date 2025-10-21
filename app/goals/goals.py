@@ -1,7 +1,6 @@
 import spacy
 import re
 from langdetect import detect_langs
-import spacy.cli
 import Levenshtein
 
 PREAMBLES = {
