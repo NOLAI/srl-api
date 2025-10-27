@@ -26,17 +26,20 @@ async def get_processes(user_id: int, course_id: int):
         'end_time': int(trace[i + 1]['start_time'] if i + 1 < len(trace) else row['start_time']),
         } for i, row in enumerate(trace) if row['process'] != 'essay_task_start' and row['process'] != 'essay_task_end']
 
-    writing_processes = await WritingProcess.filter(user_id=user_id, course_id=course_id).order_by('start_time')
-    if not len(writing_processes):
-        writing_processes = await process_writing(user_id, course_id)
-    writing_processes = [{
-        'type': PROCESSES[row.process_label]['type'],
-        'process': PROCESSES[row.process_label]['process'],
-        'start_time': int(row.start_time) - essay_start_time,
-        'end_time': int(row.end_time) - essay_start_time,
-        } for row in writing_processes]
-    trace = [row for row in trace if row['process'] != 'writing']
-    trace += writing_processes
+    try:
+        writing_processes = await WritingProcess.filter(user_id=user_id, course_id=course_id).order_by('start_time')
+        if not len(writing_processes):
+            writing_processes = await process_writing(user_id, course_id)
+        writing_processes = [{
+            'type': PROCESSES[row.process_label]['type'],
+            'process': PROCESSES[row.process_label]['process'],
+            'start_time': int(row.start_time) - essay_start_time,
+            'end_time': int(row.end_time) - essay_start_time,
+            } for row in writing_processes]
+        trace = [row for row in trace if row['process'] != 'writing']
+        trace += writing_processes
+    except:
+        pass
 
     trace.sort(key=lambda x: x['start_time'])
     return trace
@@ -48,7 +51,7 @@ async def get_processes(user_id: int, course_id: int):
 )
 async def process_writing_job():
     print("Running writing processes job...", flush=True)
-    sessions = await Essay.all().distinct().values('user_id', 'course_id')
+    sessions = await Essay.filter(save_time__gt=1733007600000).distinct().values('user_id', 'course_id')
     for session in sessions:
         if not session['user_id'] or not session['course_id']:
             continue

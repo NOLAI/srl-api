@@ -20,12 +20,12 @@ async def process_writing(user_id: int, course_id: int):
     if len(segmented_essays) == 0:
         return []
 
+    # Send to LIWC
+    liwc_results = liwc.run(segmented_essays)
+
     # Send to TSCAN
     tscan_results = await tscan.run(segmented_essays)
     tscan_results['cluster_nr'] = tscan_results.index.str.removeprefix('input/').str.removesuffix('.txt').astype(int)
-
-    # Send to LIWC
-    liwc_results = liwc.run(segmented_essays)
 
     # Compute similarity features
     similarity_results = await similarity.run(segmented_essays, course_id)
