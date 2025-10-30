@@ -1,3 +1,4 @@
+import sys
 import pandas as pd
 import numpy as np
 from difflib import Differ
@@ -55,7 +56,10 @@ def segment_essay(essay):
 
 def find_difference(start, current):
     d = Differ()
-    diff = list(d.compare(start, current))  
+    default_recursion_limit = sys.getrecursionlimit()
+    sys.setrecursionlimit(10_000)
+    diff = list(d.compare(start, current))
+    sys.setrecursionlimit(default_recursion_limit)
     added = [char[2:] for char in diff if char.startswith('+ ')]
     removed = [char[2:] for char in diff if char.startswith('- ')]
     return {"added": "".join(added), "removed": "".join(removed)}
