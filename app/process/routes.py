@@ -26,10 +26,8 @@ async def get_processes(user_id: int, course_id: int):
         'end_time': int(trace[i + 1]['start_time'] if i + 1 < len(trace) else row['start_time']),
         } for i, row in enumerate(trace) if row['process'] != 'essay_task_start' and row['process'] != 'essay_task_end']
 
-    try:
-        writing_processes = await WritingProcess.filter(user_id=user_id, course_id=course_id).order_by('start_time')
-        if not len(writing_processes):
-            writing_processes = await process_writing(user_id, course_id)
+    writing_processes = await WritingProcess.filter(user_id=user_id, course_id=course_id).order_by('start_time')
+    if len(writing_processes):
         writing_processes = [{
             'type': PROCESSES[row.process_label]['type'],
             'process': PROCESSES[row.process_label]['process'],
@@ -38,8 +36,6 @@ async def get_processes(user_id: int, course_id: int):
             } for row in writing_processes]
         trace = [row for row in trace if row['process'] != 'writing']
         trace += writing_processes
-    except:
-        pass
 
     trace.sort(key=lambda x: x['start_time'])
     return trace
