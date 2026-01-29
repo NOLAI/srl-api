@@ -10,7 +10,7 @@ class TraceData(Model):
     process_label = fields.CharField(max_length=255)
 
     class Meta:
-        table = "trace_data_real_time_process"
+        table = "trace_data"
 
     def __str__(self):
         return self.process_label
