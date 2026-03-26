@@ -1,3 +1,6 @@
+import json
+import os
+
 from fastapi import APIRouter
 from tortoise import connections
 
@@ -11,17 +14,26 @@ router = APIRouter(prefix="/api/questions", tags=["user"])
     status_code=200,
 )
 async def get_questions(id: int):
+    course_questionnaires = set()
+    course_questionnaires_path = os.path.join(os.getenv('DATA_DIR'), 'course_questionnaires.json')
+    if os.path.exists(course_questionnaires_path):
+        with open(course_questionnaires_path, 'r') as file:
+            try:
+                course_questionnaires = set(json.loads(file.read()).values())
+            except:
+                pass    
+
     db_moodle = connections.get('moodle')
     responses = await MdlQuestionnaireResponse.filter(userid=id).using_db(db_moodle).all()
     responses = [{
         "id": response.id,
-        "questionnaireid": response.questionnaireid,
+        "questionnaire_id": response.questionnaireid,
         "questionnaire": None,
-        "userid": response.userid,
+        "user_id": response.userid,
         "questions": [],
-    } for response in responses]
+    } for response in responses if response.questionnaireid in course_questionnaires]
     for response in responses:
-        questionnaire = await MdlQuestionnaire.get(id=response['questionnaireid'], using_db=db_moodle)
+        questionnaire = await MdlQuestionnaire.get(id=response['questionnaire_id'], using_db=db_moodle)
         course = await MdlCourse.get(id=questionnaire.course, using_db=db_moodle)
         response['questionnaire'] = {
             'id': questionnaire.id,
@@ -31,7 +43,7 @@ async def get_questions(id: int):
                 'name': split_lang(strip_html(course.fullname)),
             },
         }
-        questions = await MdlQuestionnaireQuestion.filter(surveyid=response['questionnaireid']).using_db(db_moodle).all()
+        questions = await MdlQuestionnaireQuestion.filter(surveyid=response['questionnaire_id']).using_db(db_moodle).all()
         for question in questions:
             try:
                 type = await MdlQuestionnaireQuestionType.get(typeid=question.type_id, using_db=db_moodle)

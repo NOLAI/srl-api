@@ -24,6 +24,15 @@ async def get_essays_list(user_id: int):
             except:
                 pass
 
+    course_to_questionnaire_mapping = {}
+    course_questionnaires_path = os.path.join(os.getenv('DATA_DIR'), 'course_questionnaires.json')
+    if os.path.exists(course_questionnaires_path):
+        with open(course_questionnaires_path, 'r') as file:
+            try:
+                course_to_questionnaire_mapping = json.loads(file.read())
+            except:
+                pass
+
     course_ids = await TraceData.filter(user_id=user_id, process_label__isnull=False).annotate(save_time_max=Max('save_time')).distinct().group_by('course_id').order_by('save_time_max').values('course_id', 'save_time_max')
 
     essays = []
@@ -42,7 +51,8 @@ async def get_essays_list(user_id: int):
             essays.append({
                 'course_id': int(course_id['course_id']),
                 'name_nl': name_nl,
-                'name_en': name_en
+                'name_en': name_en,
+                'questionnaire_id': course_to_questionnaire_mapping.get(str(course_id['course_id'])),
             })
         except:
             pass
