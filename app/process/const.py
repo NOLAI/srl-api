@@ -52,4 +52,8 @@ PROCESSES = {
     "COR": { "type": "cognition", "process": "structuring"},
     "CE": { "type": "cognition", "process": "expanding"},
     "NL": { "type": "other", "process": "not_detected"},
+
+    "CMTR2": { "type": "other", "process": "not_detected"},
+    "CSAR1": { "type": "other", "process": "not_detected"},
+    "OS3": { "type": "other", "process": "not_detected"},
 }
