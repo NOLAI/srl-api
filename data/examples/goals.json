@@ -1,0 +1,60 @@
+{
+  "1234": {
+    "en": {
+      "relevant_text": [
+        "Background text that describes the course topic and can be used for semantic similarity checks."
+      ],
+      "keywords": [
+        "course topic",
+        "supporting concept"
+      ],
+      "expected_headers": [
+        "Introduction",
+        "Main argument",
+        "Conclusion"
+      ],
+      "minimum_number_of_paragraphs": 3,
+      "main_points": [
+        {
+          "topic": "First required point",
+          "keywords": [
+            "important term",
+            "alternative phrase OR related phrase",
+            "term one AND term two"
+          ],
+          "sentences": [
+            "A sentence that represents the first required point."
+          ]
+        }
+      ]
+    },
+    "nl": {
+      "relevant_text": [
+        "Achtergrondtekst die het onderwerp van de cursus beschrijft en gebruikt kan worden voor semantische gelijkenis."
+      ],
+      "keywords": [
+        "cursusonderwerp",
+        "ondersteunend concept"
+      ],
+      "expected_headers": [
+        "Inleiding",
+        "Kernargument",
+        "Conclusie"
+      ],
+      "minimum_number_of_paragraphs": 3,
+      "main_points": [
+        {
+          "topic": "Eerste verplicht punt",
+          "keywords": [
+            "belangrijke term",
+            "alternatieve formulering OR verwante formulering",
+            "term een AND term twee"
+          ],
+          "sentences": [
+            "Een zin die het eerste verplichte punt weergeeft."
+          ]
+        }
+      ]
+    }
+  }
+}
