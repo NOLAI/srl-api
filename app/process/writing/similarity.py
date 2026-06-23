@@ -2,7 +2,7 @@ import html
 import re
 import pandas as pd
 from tortoise import connections
-from app.db.models import MdlPage
+from app.db.moodle_models import MdlPage
 import spacy
 
 nlp = spacy.load("nl_core_news_lg")

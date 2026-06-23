@@ -1,5 +1,3 @@
-# From https://medium.com/@talhakhalid101/python-tortoise-orm-integration-with-fastapi-c3751d248ce1
-from tortoise import Tortoise
 from tortoise.contrib.fastapi import register_tortoise
 from fastapi import FastAPI
 import os
@@ -23,22 +21,20 @@ MOODLE_DATABASE_URI: str = "mysql://{}:{}@{}:{}/{}".format(
 TORTOISE_ORM = {
     "connections": {"flora_annotation": FLORA_ANNOTATION_DATABASE_URI, "moodle": MOODLE_DATABASE_URI},
     "apps": {
-        "models": {
+        "flora": {
             "models": [
-                'app.db.models'
+                'app.db.flora_models'
             ],
             "default_connection": "flora_annotation",
         },
+        "moodle": {
+            "models": [
+                'app.db.moodle_models'
+            ],
+            "default_connection": "moodle",
+        },
     },
 }
-
-
-async def connect_to_db():
-    await Tortoise.init(
-        config=TORTOISE_ORM
-    )
-
-
 def register_db(app: FastAPI) -> None:
     register_tortoise(
         app,

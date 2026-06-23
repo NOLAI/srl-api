@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import xgboost as xgb
-from app.db.models import Essay, WritingProcess
+from app.db.flora_models import Essay, WritingProcess
 from app.process.writing import liwc, similarity, tscan
 from app.process.writing.segment_essay import segment
 

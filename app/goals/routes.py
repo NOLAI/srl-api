@@ -3,8 +3,11 @@ from fastapi import APIRouter
 import os
 import json
 
-from app.db.models import Essay, EssayProductGoals, TraceData
+from app.db.flora_models import Essay, EssayProductGoals, TraceData
 from app.goals.goals import init_nlp, process_essay, process_essays
+
+ESSAY_SNAPSHOT_PAUSE_MS = 3000
+
 
 router = APIRouter(prefix="/api/goals", tags=["process"])
 
@@ -25,7 +28,7 @@ async def get_goals(user_id: int, course_id: int):
     essay_start_time = int(trace[0].save_time)
 
     essays = await Essay.filter(user_id=user_id, course_id=course_id).order_by('save_time')
-    essays = [essay for i, essay in enumerate(essays) if i == len(essays)-1 or int(essays[i+1].save_time) - int(essay.save_time) > 3000]
+    essays = [essay for i, essay in enumerate(essays) if i == len(essays)-1 or int(essays[i+1].save_time) - int(essay.save_time) > ESSAY_SNAPSHOT_PAUSE_MS]
     if not len(essays):
         return []
 
@@ -89,7 +92,7 @@ async def process_essays_job():
         essays = [{
             'id': int(essay.id),
             'content': essay.essay_content,
-        } for i, essay in enumerate(essays) if (i == len(essays)-1 or int(essays[i+1].save_time) - int(essay.save_time) > 3000) and not await essay.product_goals]
+        } for i, essay in enumerate(essays) if (i == len(essays)-1 or int(essays[i+1].save_time) - int(essay.save_time) > ESSAY_SNAPSHOT_PAUSE_MS) and not await essay.product_goals]
         
         if not essays:
             continue

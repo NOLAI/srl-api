@@ -4,7 +4,7 @@ import os
 from fastapi import APIRouter
 from tortoise import connections
 
-from app.db.models import MdlCourse, MdlQuestionnaire, MdlQuestionnaireQuestion, MdlQuestionnaireQuestionChoice, MdlQuestionnaireQuestionType, MdlQuestionnaireResponse, MdlQuestionnaireResponseBool, MdlQuestionnaireResponseMultiple, MdlQuestionnaireResponseRank, MdlQuestionnaireResponseSingle, MdlQuestionnaireResponseText
+from app.db.moodle_models import MdlCourse, MdlQuestionnaire, MdlQuestionnaireQuestion, MdlQuestionnaireQuestionChoice, MdlQuestionnaireQuestionType, MdlQuestionnaireResponse, MdlQuestionnaireResponseBool, MdlQuestionnaireResponseMultiple, MdlQuestionnaireResponseRank, MdlQuestionnaireResponseSingle, MdlQuestionnaireResponseText
 from app.questions.utils import split_lang, strip_html
 
 router = APIRouter(prefix="/api/questions", tags=["user"])

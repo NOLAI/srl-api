@@ -1,7 +1,7 @@
 from app.process.const import PROCESSES
 from fastapi import APIRouter
 
-from app.db.models import Essay, TraceData, WritingProcess
+from app.db.flora_models import Essay, TraceData, WritingProcess
 from app.process.writing.writing import process_writing
 
 router = APIRouter(prefix="/api/process", tags=["process"])

@@ -79,16 +79,6 @@ def split_text(text, nlp, manual_preposition):
     return paragraphs, paragraph_sentences, main_headers
 
 
-def check_headers(paragraphs,expected_headers):
-    detected_headers = []
-    for paragraph in paragraphs:
-        if paragraph.isupper():
-            detected_headers.append(paragraph.strip())
-    if detected_headers == expected_headers:
-        return True
-    return False
-
-
 def check_headers_in_order(expected, actual):
     idx = 0
     for expected_header in expected:
@@ -200,13 +190,6 @@ def check_essay_structure(paragraphs, main_headers, task, nlp, sim_threshold = 0
 
     return [{'name': k, 'completed': v} for k, v in structure_rules.items()]
 
-def check_keywords(sentence, keywords_list):
-    pattern = '|'.join(re.escape(keyword) for keyword in keywords_list)
-    if re.search(pattern,sentence,re.IGNORECASE):
-        return True
-    return False
-
-
 def check_paragraph_relevance(paragraphs, paragraph_sentences, task, nlp, sim_threshold = 0.4):
     # main_paragraph indicate the paragraphs that should be checked for relevance
     main_paragraphs = paragraphs
@@ -273,24 +256,6 @@ def check_phrase_in_doc(doc, phrase):
     """
     # We will match the phrase as a whole (case-insensitive)
     return bool(re.search(re.escape(phrase), doc.text, flags=re.IGNORECASE)) 
-
-def check_term_in_doc_fuzzy(doc, term):
-    """
-    Check if a single term exists in the doc.
-    """
-    # We will match the term in the document (case-insensitive)
-    if(check_phrase_in_doc(doc, term)):
-        return True
-
-    doc_words = [token.text.lower for token in doc if not token.is_punct]
-    min_distance = float('inf')
-    for word in doc_words:
-        distance = Levenshtein.distance(word, term.lower())
-        if distance < min_distance:
-            min_distance = distance
-    if min_distance > 3:
-        return False
-    return True
 
 def check_phrase_in_doc_fuzzy(doc, phrase):
     """

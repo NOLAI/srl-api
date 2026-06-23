@@ -4,7 +4,8 @@ from fastapi import APIRouter
 from tortoise import connections
 from tortoise.functions import Max
 
-from app.db.models import MdlCourse, TraceData
+from app.db.flora_models import TraceData
+from app.db.moodle_models import MdlCourse
 
 router = APIRouter(prefix="/api/essay", tags=["user"])
 

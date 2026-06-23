@@ -2,7 +2,7 @@ from fastapi import APIRouter, Response
 from tortoise import connections
 from tortoise.exceptions import DoesNotExist
 
-from app.db.models import MdlUser
+from app.db.moodle_models import MdlUser
 
 router = APIRouter(prefix="/api/user", tags=["user"])
 

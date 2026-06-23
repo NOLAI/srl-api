@@ -1,0 +1,65 @@
+# Version control and repository metadata
+.git
+.github
+.gitignore
+
+# Credentials and local configuration
+.env
+.env.*
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Research and runtime data
+data/
+*.csv
+*.db
+*.pkl
+*.pickle
+*.sqlite
+*.sqlite3
+*.tsv
+*.xls
+*.xlsx
+
+# Python environments and generated files
+.venv/
+venv/
+env/
+ENV/
+.python-version
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Test, type-checker, and coverage output
+.cache/
+.coverage
+.coverage.*
+.hypothesis/
+.mypy_cache/
+.nox/
+.pytest_cache/
+.ruff_cache/
+.tox/
+coverage.xml
+htmlcov/
+.ipynb_checkpoints/
+
+# Editor and operating-system files
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
+
+# Runtime output
+*.log
+
+# Files not required in the runtime image
+.dockerignore
+docker-compose*.yml
+README*

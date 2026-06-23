@@ -1,56 +1,6 @@
-from tortoise.models import Model
 from tortoise import fields
+from tortoise.models import Model
 
-
-class TraceData(Model):
-    id = fields.IntField(pk=True)
-    user_id = fields.IntField()
-    course_id = fields.IntField()
-    save_time = fields.BigIntField()
-    process_label = fields.CharField(max_length=255)
-
-    class Meta:
-        table = "trace_data"
-
-    def __str__(self):
-        return self.process_label
-    
-class WritingProcess(Model):
-    id = fields.IntField(pk=True)
-    user_id = fields.IntField(null=False)
-    course_id = fields.IntField(null=False)
-    start_time = fields.BigIntField(null=False)
-    end_time = fields.BigIntField(null=False)
-    process_label = fields.CharField(max_length=255, null=False)
-
-    class Meta:
-        table = "writing_process"
-
-    def __str__(self):
-        return self.process_label
-    
-class Essay(Model):
-    id = fields.IntField(pk=True)
-    user_id = fields.IntField()
-    course_id = fields.IntField()
-    save_time = fields.BigIntField()
-    essay_content = fields.TextField()
-
-    class Meta:
-        table = "essay"
-
-    def __str__(self):
-        return self.essay_content
-    
-class EssayProductGoals(Model):
-    id = fields.IntField(pk=True)
-    essay = fields.ForeignKeyField("models.Essay", related_name="product_goals")
-    structure = fields.JSONField()
-    relevance = fields.JSONField()
-    main_points = fields.JSONField()
-
-    class Meta:
-        table = "essay_product_goals"
 
 class MdlUser(Model):
     id = fields.IntField(pk=True)
@@ -61,7 +11,8 @@ class MdlUser(Model):
 
     def __str__(self):
         return self.username
-    
+
+
 class MdlCourse(Model):
     id = fields.IntField(pk=True)
     fullname = fields.CharField(max_length=255)
@@ -72,7 +23,7 @@ class MdlCourse(Model):
 
     def __str__(self):
         return self.fullname
-    
+
 
 class MdlPage(Model):
     id = fields.IntField(pk=True)
@@ -97,7 +48,7 @@ class MdlQuestionnaire(Model):
 
     def __str__(self):
         return self.name
-    
+
 
 class MdlQuestionnaireQuestion(Model):
     id = fields.IntField(pk=True)
@@ -108,7 +59,8 @@ class MdlQuestionnaireQuestion(Model):
 
     class Meta:
         table = "mdl_questionnaire_question"
-    
+
+
 class MdlQuestionnaireQuestionType(Model):
     id = fields.IntField(pk=True)
     typeid = fields.IntField()
@@ -127,7 +79,7 @@ class MdlQuestionnaireQuestionChoice(Model):
 
     class Meta:
         table = "mdl_questionnaire_quest_choice"
-    
+
 
 class MdlQuestionnaireResponse(Model):
     id = fields.IntField(pk=True)
@@ -136,6 +88,7 @@ class MdlQuestionnaireResponse(Model):
 
     class Meta:
         table = "mdl_questionnaire_response"
+
 
 class MdlQuestionnaireResponseBool(Model):
     id = fields.IntField(pk=True)
@@ -146,6 +99,7 @@ class MdlQuestionnaireResponseBool(Model):
     class Meta:
         table = "mdl_questionnaire_response_bool"
 
+
 class MdlQuestionnaireResponseText(Model):
     id = fields.IntField(pk=True)
     response_id = fields.IntField()
@@ -154,6 +108,7 @@ class MdlQuestionnaireResponseText(Model):
 
     class Meta:
         table = "mdl_questionnaire_response_text"
+
 
 class MdlQuestionnaireResponseMultiple(Model):
     id = fields.IntField(pk=True)
@@ -174,6 +129,7 @@ class MdlQuestionnaireResponseSingle(Model):
     class Meta:
         table = "mdl_questionnaire_resp_single"
 
+
 class MdlQuestionnaireResponseRank(Model):
     id = fields.IntField(pk=True)
     response_id = fields.IntField()
@@ -183,4 +139,3 @@ class MdlQuestionnaireResponseRank(Model):
 
     class Meta:
         table = "mdl_questionnaire_response_rank"
-
