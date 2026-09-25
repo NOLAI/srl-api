@@ -32,7 +32,7 @@ Writing activity can also be classified from saved essay revisions. The classifi
 
 The XGBoost model and related writing-process generation code were created for:
 
-Bistolfi, I., de Mooij, S., van der Graaf, J., & Molenaar, I. (2025). Towards real-time automated self-regulated learning detection in essays. In A. I. Cristea, E. Walker, L. Yu, O. C. Santos, & S. Isotani (Eds.), _Artificial Intelligence in Education. AIED 2025_ (Lecture Notes in Computer Science, Vol. 15879). Springer, Cham. <https://doi.org/10.1007/978-3-031-98420-4_27>
+[Bistolfi, I., de Mooij, S., van der Graaf, J., & Molenaar, I. (2025, July). Towards real-time automated self-regulated learning detection in essays. In International Conference on Artificial Intelligence in Education (pp. 377-392). Cham: Springer Nature Switzerland.](https://doi.org/10.1007/978-3-031-98420-4_27)
 
 ### Product goals
 
